@@ -1,0 +1,104 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Gobang API
+    description: The greeting service definition.
+    version: 0.0.1
+paths:
+    /api/room/create:
+        post:
+            tags:
+                - Gobang
+            operationId: Gobang_RoomCreate
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/gobang.v1.RoomRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/gobang.v1.RoomReply'
+    /api/users/login:
+        post:
+            tags:
+                - Gobang
+            operationId: Gobang_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/gobang.v1.LoginReq'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/gobang.v1.RegisterReply'
+    /api/users/register:
+        post:
+            tags:
+                - Gobang
+            operationId: Gobang_Register
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/gobang.v1.RegisterReq'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/gobang.v1.RegisterReply'
+components:
+    schemas:
+        gobang.v1.LoginReq:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+        gobang.v1.RegisterReply:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                mobile:
+                    type: string
+                username:
+                    type: string
+                token:
+                    type: string
+                expiredAt:
+                    type: integer
+                    format: int64
+        gobang.v1.RegisterReq:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+        gobang.v1.RoomReply:
+            type: object
+            properties: {}
+        gobang.v1.RoomRequest:
+            type: object
+            properties:
+                title:
+                    type: string
+tags:
+    - name: Gobang

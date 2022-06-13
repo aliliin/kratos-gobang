@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package gobang.v1;
+
+option go_package = "service/api/gobang/v1;v1";
+option java_multiple_files = true;
+option java_package = "gobang.v1";
+option objc_class_prefix = "APIGobangV1";
+
+enum ErrorReason {
+  GOBANG_UNSPECIFIED = 0;
+  USER_NOT_FOUND = 1;
+}

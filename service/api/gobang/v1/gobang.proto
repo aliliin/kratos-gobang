@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package gobang.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+
+option go_package = "service/api/gobang/v1;v1";
+
+// The greeting service definition.
+service Gobang {
+  rpc Register (RegisterReq) returns (RegisterReply) {
+    option (google.api.http) = {
+      post: "/api/users/register",
+      body: "*",
+    };
+  }
+  rpc Login (LoginReq) returns (RegisterReply) {
+    option (google.api.http) = {
+      post: "/api/users/login",
+      body: "*",
+    };
+  }
+  rpc RoomCreate (RoomRequest) returns (RoomReply) {
+    option (google.api.http) = {
+      post: "/api/room/create",
+      body: "*",
+    };
+  }
+}
+message RoomRequest {
+  string title = 1;
+}
+message RoomReply {
+
+}
+
+message RegisterReply {
+  int64 id = 1;
+  string mobile = 3;
+  string username = 4;
+  string token = 5;
+  int64 expiredAt = 6;
+}
+
+message RegisterReq {
+  string username = 1 [(validate.rules).string = {min_len: 3, max_len: 15}];
+  string password = 2 [(validate.rules).string = {min_len: 8}];
+}
+
+message LoginReq {
+  string username = 1 [(validate.rules).string = {min_len: 3, max_len: 15}];
+  string password = 2 [(validate.rules).string = {min_len: 8}];
+}
