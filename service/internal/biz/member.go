@@ -2,28 +2,30 @@ package biz
 
 import (
 	"context"
-
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
-	v1 "service/api/gobang/v1"
+	"service/internal/conf"
+	"service/internal/pkg/auth"
+	"time"
 )
 
 var (
-	// ErrUserNotFound is user not found.
-	ErrUserNotFound = errors.NotFound(v1.ErrorReason_USER_NOT_FOUND.String(), "user not found")
+	ErrUserPassword = errors.Forbidden("USER_PASSWORD_ERROR", "用户密码错误")
 )
 
-// Member is a Member model.
 type Member struct {
-	Hello string
+	ID          int64     `json:"id"`
+	UserName    string    `json:"username"`
+	Password    string    `json:"password"`
+	CreatedAt   time.Time `json:"created_at"`
+	LastLoginAt time.Time `json:"last_login_at"`
+	Token       string    `json:"token"`
 }
 
 // MemberRepo is a Greater repo.
 type MemberRepo interface {
 	Save(context.Context, *Member) (*Member, error)
-	Update(context.Context, *Member) (*Member, error)
-	FindByID(context.Context, int64) (*Member, error)
-	ListByHello(context.Context, string) ([]*Member, error)
+	FindByUsername(context.Context, *Member) (*Member, error)
 	ListAll(context.Context) ([]*Member, error)
 }
 
@@ -31,15 +33,34 @@ type MemberRepo interface {
 type MemberUsecase struct {
 	repo MemberRepo
 	log  *log.Helper
+
+	jwtc *conf.JWT
 }
 
 // NewMemberUsecase new a Member usecase.
-func NewMemberUsecase(repo MemberRepo, logger log.Logger) *MemberUsecase {
-	return &MemberUsecase{repo: repo, log: log.NewHelper(logger)}
+func NewMemberUsecase(repo MemberRepo, logger log.Logger, jwt *conf.JWT) *MemberUsecase {
+	return &MemberUsecase{repo: repo, log: log.NewHelper(logger), jwtc: jwt}
 }
 
 // CreateMember creates a Member, and returns the new Member.
-func (uc *MemberUsecase) CreateMember(ctx context.Context, g *Member) (*Member, error) {
-	uc.log.WithContext(ctx).Infof("CreateMember: %v", g.Hello)
-	return uc.repo.Save(ctx, g)
+func (uc *MemberUsecase) CreateMember(ctx context.Context, r *Member) (*Member, error) {
+	return uc.repo.Save(ctx, r)
+}
+
+func (uc *MemberUsecase) CheckMember(ctx context.Context, r *Member) (*Member, error) {
+	user, err := uc.repo.FindByUsername(ctx, r)
+	if err != nil {
+		return nil, err
+	}
+	return &Member{
+		ID:          user.ID,
+		UserName:    user.UserName,
+		CreatedAt:   user.CreatedAt,
+		LastLoginAt: user.LastLoginAt,
+		Token:       uc.generateToken(r.UserName),
+	}, nil
+}
+
+func (uc *MemberUsecase) generateToken(username string) string {
+	return auth.GenerateToken(uc.jwtc.Secret, username)
 }

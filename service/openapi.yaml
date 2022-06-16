@@ -25,6 +25,42 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/gobang.v1.HelloReply'
+    /member/login:
+        post:
+            tags:
+                - Gobang
+            operationId: Gobang_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/gobang.v1.LoginReq'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/gobang.v1.LoginReply'
+    /member/register:
+        post:
+            tags:
+                - Gobang
+            operationId: Gobang_Register
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/gobang.v1.RegisterReq'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/gobang.v1.RegisterReply'
     /member/status:
         get:
             tags:
@@ -60,42 +96,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/gobang.v1.RoomReply'
-    /users/login:
-        post:
-            tags:
-                - Gobang
-            operationId: Gobang_Login
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/gobang.v1.LoginReq'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/gobang.v1.RegisterReply'
-    /users/register:
-        post:
-            tags:
-                - Gobang
-            operationId: Gobang_Register
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/gobang.v1.RegisterReq'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/gobang.v1.RegisterReply'
 components:
     schemas:
         gobang.v1.HelloReply:
@@ -104,6 +104,11 @@ components:
                 message:
                     type: string
             description: The response message containing the greetings
+        gobang.v1.LoginReply:
+            type: object
+            properties:
+                token:
+                    type: string
         gobang.v1.LoginReq:
             type: object
             properties:
@@ -117,15 +122,12 @@ components:
                 id:
                     type: integer
                     format: int64
-                mobile:
-                    type: string
                 username:
                     type: string
-                token:
+                lastLoginAt:
                     type: string
-                expiredAt:
-                    type: integer
-                    format: int64
+                createdAt:
+                    type: string
         gobang.v1.RegisterReq:
             type: object
             properties:

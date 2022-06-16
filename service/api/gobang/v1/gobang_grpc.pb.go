@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GobangClient interface {
 	Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterReply, error)
-	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*RegisterReply, error)
+	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginReply, error)
 	MemberStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusReply, error)
 	RoomCreate(ctx context.Context, in *RoomRequest, opts ...grpc.CallOption) (*RoomReply, error)
 	SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)
@@ -46,8 +46,8 @@ func (c *gobangClient) Register(ctx context.Context, in *RegisterReq, opts ...gr
 	return out, nil
 }
 
-func (c *gobangClient) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*RegisterReply, error) {
-	out := new(RegisterReply)
+func (c *gobangClient) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginReply, error) {
+	out := new(LoginReply)
 	err := c.cc.Invoke(ctx, "/gobang.v1.Gobang/Login", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func (c *gobangClient) SayHello(ctx context.Context, in *HelloRequest, opts ...g
 // for forward compatibility
 type GobangServer interface {
 	Register(context.Context, *RegisterReq) (*RegisterReply, error)
-	Login(context.Context, *LoginReq) (*RegisterReply, error)
+	Login(context.Context, *LoginReq) (*LoginReply, error)
 	MemberStatus(context.Context, *StatusRequest) (*StatusReply, error)
 	RoomCreate(context.Context, *RoomRequest) (*RoomReply, error)
 	SayHello(context.Context, *HelloRequest) (*HelloReply, error)
@@ -101,7 +101,7 @@ type UnimplementedGobangServer struct {
 func (UnimplementedGobangServer) Register(context.Context, *RegisterReq) (*RegisterReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
-func (UnimplementedGobangServer) Login(context.Context, *LoginReq) (*RegisterReply, error) {
+func (UnimplementedGobangServer) Login(context.Context, *LoginReq) (*LoginReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
 func (UnimplementedGobangServer) MemberStatus(context.Context, *StatusRequest) (*StatusReply, error) {
