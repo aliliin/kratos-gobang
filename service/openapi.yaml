@@ -7,7 +7,42 @@ info:
     description: The greeting service definition.
     version: 0.0.1
 paths:
-    /api/room/create:
+    /helloworld/{name}:
+        get:
+            tags:
+                - Gobang
+            operationId: Gobang_SayHello
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/gobang.v1.HelloReply'
+    /member/status:
+        get:
+            tags:
+                - Gobang
+            operationId: Gobang_MemberStatus
+            parameters:
+                - name: sessionid
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/gobang.v1.StatusReply'
+    /room/create:
         post:
             tags:
                 - Gobang
@@ -25,7 +60,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/gobang.v1.RoomReply'
-    /api/users/login:
+    /users/login:
         post:
             tags:
                 - Gobang
@@ -43,7 +78,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/gobang.v1.RegisterReply'
-    /api/users/register:
+    /users/register:
         post:
             tags:
                 - Gobang
@@ -63,6 +98,12 @@ paths:
                                 $ref: '#/components/schemas/gobang.v1.RegisterReply'
 components:
     schemas:
+        gobang.v1.HelloReply:
+            type: object
+            properties:
+                message:
+                    type: string
+            description: The response message containing the greetings
         gobang.v1.LoginReq:
             type: object
             properties:
@@ -99,6 +140,14 @@ components:
             type: object
             properties:
                 title:
+                    type: string
+        gobang.v1.StatusReply:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                username:
                     type: string
 tags:
     - name: Gobang

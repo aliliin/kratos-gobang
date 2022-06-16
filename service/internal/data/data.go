@@ -1,12 +1,14 @@
 package data
 
 import (
+	"service/internal/conf"
+
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-redis/redis/v9"
 	"github.com/google/wire"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"service/internal/conf"
+
 	// init mysql driver
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -52,7 +54,7 @@ func NewRedis(c *conf.Data) *redis.Client {
 		WriteTimeout: c.Redis.WriteTimeout.AsDuration(),
 		ReadTimeout:  c.Redis.ReadTimeout.AsDuration(),
 	})
-	rdb.AddHook(redisotel.TracingHook{})
+	//rdb.AddHook(redisotel.TracingHook{})
 	if err := rdb.Close(); err != nil {
 		log.Error(err)
 	}

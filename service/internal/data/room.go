@@ -41,22 +41,22 @@ func NewRoomRepo(data *Data, logger log.Logger) biz.RoomRepo {
 	}
 }
 
-func (r *RoomRepo) Save(ctx context.Context, g *biz.Greeter) (*biz.Greeter, error) {
+func (r *RoomRepo) Save(ctx context.Context, g *biz.Room) (*biz.Room, error) {
 	return g, nil
 }
 
-func (r *RoomRepo) Update(ctx context.Context, g *biz.Greeter) (*biz.Greeter, error) {
+func (r *RoomRepo) Update(ctx context.Context, g *biz.Room) (*biz.Room, error) {
 	return g, nil
 }
 
-func (r *RoomRepo) FindByID(context.Context, int64) (*biz.Greeter, error) {
+func (r *RoomRepo) FindByID(context.Context, int64) (*biz.Room, error) {
 	return nil, nil
 }
 
-func (r *RoomRepo) ListByHello(context.Context, string) ([]*biz.Greeter, error) {
+func (r *RoomRepo) ListByHello(context.Context, string) ([]*biz.Room, error) {
 	return nil, nil
 }
 
-func (r *RoomRepo) ListAll(context.Context) ([]*biz.Greeter, error) {
+func (r *RoomRepo) ListAll(context.Context) ([]*biz.Room, error) {
 	return nil, nil
 }

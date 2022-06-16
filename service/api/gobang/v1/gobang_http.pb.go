@@ -19,19 +19,25 @@ const _ = http.SupportPackageIsVersion1
 
 const OperationGobangRegister = "/gobang.v1.Gobang/Register"
 const OperationGobangLogin = "/gobang.v1.Gobang/Login"
+const OperationGobangMemberStatus = "/gobang.v1.Gobang/MemberStatus"
 const OperationGobangRoomCreate = "/gobang.v1.Gobang/RoomCreate"
+const OperationGobangSayHello = "/gobang.v1.Gobang/SayHello"
 
 type GobangHTTPServer interface {
 	Login(context.Context, *LoginReq) (*RegisterReply, error)
+	MemberStatus(context.Context, *StatusRequest) (*StatusReply, error)
 	Register(context.Context, *RegisterReq) (*RegisterReply, error)
 	RoomCreate(context.Context, *RoomRequest) (*RoomReply, error)
+	SayHello(context.Context, *HelloRequest) (*HelloReply, error)
 }
 
 func RegisterGobangHTTPServer(s *http.Server, srv GobangHTTPServer) {
 	r := s.Route("/")
-	r.POST("/api/users/register", _Gobang_Register0_HTTP_Handler(srv))
-	r.POST("/api/users/login", _Gobang_Login0_HTTP_Handler(srv))
-	r.POST("/api/room/create", _Gobang_RoomCreate0_HTTP_Handler(srv))
+	r.POST("/users/register", _Gobang_Register0_HTTP_Handler(srv))
+	r.POST("/users/login", _Gobang_Login0_HTTP_Handler(srv))
+	r.GET("/member/status", _Gobang_MemberStatus0_HTTP_Handler(srv))
+	r.POST("/room/create", _Gobang_RoomCreate0_HTTP_Handler(srv))
+	r.GET("/helloworld/{name}", _Gobang_SayHello0_HTTP_Handler(srv))
 }
 
 func _Gobang_Register0_HTTP_Handler(srv GobangHTTPServer) func(ctx http.Context) error {
@@ -72,6 +78,25 @@ func _Gobang_Login0_HTTP_Handler(srv GobangHTTPServer) func(ctx http.Context) er
 	}
 }
 
+func _Gobang_MemberStatus0_HTTP_Handler(srv GobangHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in StatusRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGobangMemberStatus)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.MemberStatus(ctx, req.(*StatusRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*StatusReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _Gobang_RoomCreate0_HTTP_Handler(srv GobangHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in RoomRequest
@@ -91,10 +116,34 @@ func _Gobang_RoomCreate0_HTTP_Handler(srv GobangHTTPServer) func(ctx http.Contex
 	}
 }
 
+func _Gobang_SayHello0_HTTP_Handler(srv GobangHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in HelloRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGobangSayHello)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SayHello(ctx, req.(*HelloRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*HelloReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type GobangHTTPClient interface {
 	Login(ctx context.Context, req *LoginReq, opts ...http.CallOption) (rsp *RegisterReply, err error)
+	MemberStatus(ctx context.Context, req *StatusRequest, opts ...http.CallOption) (rsp *StatusReply, err error)
 	Register(ctx context.Context, req *RegisterReq, opts ...http.CallOption) (rsp *RegisterReply, err error)
 	RoomCreate(ctx context.Context, req *RoomRequest, opts ...http.CallOption) (rsp *RoomReply, err error)
+	SayHello(ctx context.Context, req *HelloRequest, opts ...http.CallOption) (rsp *HelloReply, err error)
 }
 
 type GobangHTTPClientImpl struct {
@@ -107,7 +156,7 @@ func NewGobangHTTPClient(client *http.Client) GobangHTTPClient {
 
 func (c *GobangHTTPClientImpl) Login(ctx context.Context, in *LoginReq, opts ...http.CallOption) (*RegisterReply, error) {
 	var out RegisterReply
-	pattern := "/api/users/login"
+	pattern := "/users/login"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationGobangLogin))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -118,9 +167,22 @@ func (c *GobangHTTPClientImpl) Login(ctx context.Context, in *LoginReq, opts ...
 	return &out, err
 }
 
+func (c *GobangHTTPClientImpl) MemberStatus(ctx context.Context, in *StatusRequest, opts ...http.CallOption) (*StatusReply, error) {
+	var out StatusReply
+	pattern := "/member/status"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationGobangMemberStatus))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
 func (c *GobangHTTPClientImpl) Register(ctx context.Context, in *RegisterReq, opts ...http.CallOption) (*RegisterReply, error) {
 	var out RegisterReply
-	pattern := "/api/users/register"
+	pattern := "/users/register"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationGobangRegister))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -133,11 +195,24 @@ func (c *GobangHTTPClientImpl) Register(ctx context.Context, in *RegisterReq, op
 
 func (c *GobangHTTPClientImpl) RoomCreate(ctx context.Context, in *RoomRequest, opts ...http.CallOption) (*RoomReply, error) {
 	var out RoomReply
-	pattern := "/api/room/create"
+	pattern := "/room/create"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationGobangRoomCreate))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *GobangHTTPClientImpl) SayHello(ctx context.Context, in *HelloRequest, opts ...http.CallOption) (*HelloReply, error) {
+	var out HelloReply
+	pattern := "/helloworld/{name}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationGobangSayHello))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

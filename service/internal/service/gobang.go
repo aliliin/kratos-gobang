@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-
 	v1 "service/api/gobang/v1"
 	"service/internal/biz"
 )
@@ -19,11 +18,14 @@ func NewGobangService(uc *biz.MemberUsecase) *GobangService {
 	return &GobangService{uc: uc}
 }
 
-// SayHello implements gobang.GobangServer.
+// SayHello implements helloworld.GreeterServer.
 func (s *GobangService) SayHello(ctx context.Context, in *v1.HelloRequest) (*v1.HelloReply, error) {
-	g, err := s.uc.CreateGobang(ctx, &biz.Gobang{Hello: in.Name})
-	if err != nil {
-		return nil, err
-	}
-	return &v1.HelloReply{Message: "Hello " + g.Hello}, nil
+	return &v1.HelloReply{Message: "Hello "}, nil
+}
+
+func (s *GobangService) MemberStatus(ctx context.Context, in *v1.StatusRequest) (*v1.StatusReply, error) {
+	return &v1.StatusReply{
+		Id:       1,
+		Username: "ddddddd",
+	}, nil
 }

@@ -12,23 +12,54 @@ option go_package = "service/api/gobang/v1;v1";
 service Gobang {
   rpc Register (RegisterReq) returns (RegisterReply) {
     option (google.api.http) = {
-      post: "/api/users/register",
+      post: "/member/register",
       body: "*",
     };
   }
   rpc Login (LoginReq) returns (RegisterReply) {
     option (google.api.http) = {
-      post: "/api/users/login",
+      post: "/users/login",
       body: "*",
     };
   }
+
+  rpc MemberStatus (StatusRequest) returns (StatusReply) {
+    option (google.api.http) = {
+      get: "/member/status",
+    };
+  }
+
   rpc RoomCreate (RoomRequest) returns (RoomReply) {
     option (google.api.http) = {
-      post: "/api/room/create",
+      post: "/room/create",
       body: "*",
+    };
+  }
+  rpc SayHello (HelloRequest) returns (HelloReply) {
+    option (google.api.http) = {
+      get: "/helloworld/{name}"
     };
   }
 }
+
+message StatusReply {
+  int32 id = 1;
+  string username = 2;
+}
+message  StatusRequest {
+  string sessionid = 1;
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1;
+}
+
 message RoomRequest {
   string title = 1;
 }
