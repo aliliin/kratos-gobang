@@ -8,6 +8,7 @@ import (
 	context "context"
 	http "github.com/go-kratos/kratos/v2/transport/http"
 	binding "github.com/go-kratos/kratos/v2/transport/http/binding"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -25,7 +26,7 @@ const OperationGobangSayHello = "/gobang.v1.Gobang/SayHello"
 
 type GobangHTTPServer interface {
 	Login(context.Context, *LoginReq) (*LoginReply, error)
-	MemberStatus(context.Context, *StatusRequest) (*StatusReply, error)
+	MemberStatus(context.Context, *emptypb.Empty) (*StatusReply, error)
 	Register(context.Context, *RegisterReq) (*RegisterReply, error)
 	RoomCreate(context.Context, *RoomRequest) (*RoomReply, error)
 	SayHello(context.Context, *HelloRequest) (*HelloReply, error)
@@ -80,13 +81,13 @@ func _Gobang_Login0_HTTP_Handler(srv GobangHTTPServer) func(ctx http.Context) er
 
 func _Gobang_MemberStatus0_HTTP_Handler(srv GobangHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in StatusRequest
+		var in emptypb.Empty
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
 		http.SetOperation(ctx, OperationGobangMemberStatus)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.MemberStatus(ctx, req.(*StatusRequest))
+			return srv.MemberStatus(ctx, req.(*emptypb.Empty))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -140,7 +141,7 @@ func _Gobang_SayHello0_HTTP_Handler(srv GobangHTTPServer) func(ctx http.Context)
 
 type GobangHTTPClient interface {
 	Login(ctx context.Context, req *LoginReq, opts ...http.CallOption) (rsp *LoginReply, err error)
-	MemberStatus(ctx context.Context, req *StatusRequest, opts ...http.CallOption) (rsp *StatusReply, err error)
+	MemberStatus(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *StatusReply, err error)
 	Register(ctx context.Context, req *RegisterReq, opts ...http.CallOption) (rsp *RegisterReply, err error)
 	RoomCreate(ctx context.Context, req *RoomRequest, opts ...http.CallOption) (rsp *RoomReply, err error)
 	SayHello(ctx context.Context, req *HelloRequest, opts ...http.CallOption) (rsp *HelloReply, err error)
@@ -167,7 +168,7 @@ func (c *GobangHTTPClientImpl) Login(ctx context.Context, in *LoginReq, opts ...
 	return &out, err
 }
 
-func (c *GobangHTTPClientImpl) MemberStatus(ctx context.Context, in *StatusRequest, opts ...http.CallOption) (*StatusReply, error) {
+func (c *GobangHTTPClientImpl) MemberStatus(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*StatusReply, error) {
 	var out StatusReply
 	pattern := "/member/status"
 	path := binding.EncodeURL(pattern, in, true)

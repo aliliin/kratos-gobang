@@ -2,11 +2,15 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/transport"
+	"github.com/golang-jwt/jwt/v4"
+	"google.golang.org/protobuf/types/known/emptypb"
 	v1 "service/api/gobang/v1"
 	"service/internal/biz"
-	"service/internal/pkg/auth"
+	"strings"
 )
 
 // GobangService is a Gobang service.
@@ -53,21 +57,48 @@ func (s *GobangService) Login(ctx context.Context, in *v1.LoginReq) (*v1.LoginRe
 	return &v1.LoginReply{Token: member.Token}, nil
 }
 
-func (s *GobangService) MemberStatus(ctx context.Context, in *v1.StatusRequest) (*v1.StatusReply, error) {
-	cu := auth.FromContext(ctx)
-	fmt.Println("cu.", cu.Username)
+func (s *GobangService) MemberStatus(ctx context.Context, r *emptypb.Empty) (*v1.StatusReply, error) {
+	if tr, ok := transport.FromServerContext(ctx); ok {
+		tokenString := tr.RequestHeader().Get("Authorization")
+		if tokenString != "" {
+			auths := strings.SplitN(tokenString, " ", 2)
+			if len(auths) != 2 || !strings.EqualFold(auths[0], "Token") {
+				return nil, errors.New("jwt token missing")
+			}
+			token, err := jwt.Parse(auths[1], func(token *jwt.Token) (interface{}, error) {
+				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+				}
+				secret := "gobang"
+				return []byte(secret), nil
+			})
+			if err != nil {
+				return nil, err
+			}
 
-	//user, err := uc.uRepo.UserById(ctx, uId)
+			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+				if u, ok := claims["username"]; ok {
+					fmt.Println(u.(string))
+					member, err := s.uc.FindByMember(ctx, u.(string))
+					if err != nil {
+						return nil, err
+					}
+					if member != nil {
+						return &v1.StatusReply{
+							Id:       int32(member.ID),
+							Username: member.UserName,
+						}, nil
+					}
+					return nil, nil
 
-	//transport.Header.Get(ctx, "X-Session-Id")
-	//if header, ok := transport.FromServerContext(ctx); ok {
-	//	path := header.RequestHeader().Get("X-Session-Id")
-	//	fmt.Println(path)
-	//	//fmt.Println(header)
-	//} else {
-	//	return nil, errors.New(500, "jwt claim missing", "dfasd")
-	//}
-	//return nil, errors.New(999, "not implemented", "not implemented")
-	//return &v1.StatusReply{}, nil
+				}
+
+			} else {
+				return nil, errors.New("Token Invalid")
+			}
+		}
+
+	}
 	return nil, nil
+
 }

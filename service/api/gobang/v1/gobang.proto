@@ -4,7 +4,7 @@ package gobang.v1;
 
 import "google/api/annotations.proto";
 import "validate/validate.proto";
-
+import "google/protobuf/empty.proto";
 
 option go_package = "service/api/gobang/v1;v1";
 
@@ -23,7 +23,7 @@ service Gobang {
     };
   }
 
-  rpc MemberStatus (StatusRequest) returns (StatusReply) {
+  rpc MemberStatus (google.protobuf.Empty) returns (StatusReply) {
     option (google.api.http) = {
       get: "/member/status",
     };

@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -24,7 +25,7 @@ const _ = grpc.SupportPackageIsVersion7
 type GobangClient interface {
 	Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterReply, error)
 	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginReply, error)
-	MemberStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusReply, error)
+	MemberStatus(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*StatusReply, error)
 	RoomCreate(ctx context.Context, in *RoomRequest, opts ...grpc.CallOption) (*RoomReply, error)
 	SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)
 }
@@ -55,7 +56,7 @@ func (c *gobangClient) Login(ctx context.Context, in *LoginReq, opts ...grpc.Cal
 	return out, nil
 }
 
-func (c *gobangClient) MemberStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusReply, error) {
+func (c *gobangClient) MemberStatus(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*StatusReply, error) {
 	out := new(StatusReply)
 	err := c.cc.Invoke(ctx, "/gobang.v1.Gobang/MemberStatus", in, out, opts...)
 	if err != nil {
@@ -88,7 +89,7 @@ func (c *gobangClient) SayHello(ctx context.Context, in *HelloRequest, opts ...g
 type GobangServer interface {
 	Register(context.Context, *RegisterReq) (*RegisterReply, error)
 	Login(context.Context, *LoginReq) (*LoginReply, error)
-	MemberStatus(context.Context, *StatusRequest) (*StatusReply, error)
+	MemberStatus(context.Context, *emptypb.Empty) (*StatusReply, error)
 	RoomCreate(context.Context, *RoomRequest) (*RoomReply, error)
 	SayHello(context.Context, *HelloRequest) (*HelloReply, error)
 	mustEmbedUnimplementedGobangServer()
@@ -104,7 +105,7 @@ func (UnimplementedGobangServer) Register(context.Context, *RegisterReq) (*Regis
 func (UnimplementedGobangServer) Login(context.Context, *LoginReq) (*LoginReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedGobangServer) MemberStatus(context.Context, *StatusRequest) (*StatusReply, error) {
+func (UnimplementedGobangServer) MemberStatus(context.Context, *emptypb.Empty) (*StatusReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MemberStatus not implemented")
 }
 func (UnimplementedGobangServer) RoomCreate(context.Context, *RoomRequest) (*RoomReply, error) {
@@ -163,7 +164,7 @@ func _Gobang_Login_Handler(srv interface{}, ctx context.Context, dec func(interf
 }
 
 func _Gobang_MemberStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StatusRequest)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -175,7 +176,7 @@ func _Gobang_MemberStatus_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: "/gobang.v1.Gobang/MemberStatus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GobangServer).MemberStatus(ctx, req.(*StatusRequest))
+		return srv.(GobangServer).MemberStatus(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }

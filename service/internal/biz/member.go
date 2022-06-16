@@ -26,6 +26,7 @@ type Member struct {
 type MemberRepo interface {
 	Save(context.Context, *Member) (*Member, error)
 	FindByUsername(context.Context, *Member) (*Member, error)
+	FindByMemberName(context.Context, string) (*Member, error)
 	ListAll(context.Context) ([]*Member, error)
 }
 
@@ -59,6 +60,23 @@ func (uc *MemberUsecase) CheckMember(ctx context.Context, r *Member) (*Member, e
 		LastLoginAt: user.LastLoginAt,
 		Token:       uc.generateToken(r.UserName),
 	}, nil
+}
+
+func (uc *MemberUsecase) FindByMember(ctx context.Context, username string) (*Member, error) {
+
+	user, err := uc.repo.FindByMemberName(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+	if user != nil {
+		return &Member{
+			ID:          user.ID,
+			UserName:    user.UserName,
+			CreatedAt:   user.CreatedAt,
+			LastLoginAt: user.LastLoginAt,
+		}, nil
+	}
+	return nil, nil
 }
 
 func (uc *MemberUsecase) generateToken(username string) string {

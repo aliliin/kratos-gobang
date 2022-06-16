@@ -42,6 +42,7 @@ func JWTAuth(secret string) middleware.Middleware {
 					return nil, errors.New("jwt token missing")
 				}
 				token, err := jwt.Parse(auths[1], func(token *jwt.Token) (interface{}, error) {
+					fmt.Println("token,,token", token)
 					if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 						return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 					}
@@ -68,7 +69,10 @@ func JWTAuth(secret string) middleware.Middleware {
 }
 
 func FromContext(ctx context.Context) *CurrentUser {
-	return ctx.Value(currentUserKey).(*CurrentUser)
+	if user := ctx.Value(currentUserKey); user != nil {
+		return user.(*CurrentUser)
+	}
+	return nil
 }
 
 func WithContext(ctx context.Context, user *CurrentUser) context.Context {

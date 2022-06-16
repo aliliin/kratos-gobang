@@ -66,11 +66,6 @@ paths:
             tags:
                 - Gobang
             operationId: Gobang_MemberStatus
-            parameters:
-                - name: sessionid
-                  in: query
-                  schema:
-                    type: string
             responses:
                 "200":
                     description: OK

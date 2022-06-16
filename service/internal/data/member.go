@@ -81,6 +81,21 @@ func (r *memberRepo) FindByUsername(ctx context.Context, u *biz.Member) (*biz.Me
 	return nil, errors.New(500, "PASSWORD_ERROR", "密码错误")
 }
 
+func (r *memberRepo) FindByMemberName(ctx context.Context, username string) (*biz.Member, error) {
+	var member Member
+	result := r.data.db.Where(&Member{Username: username}).First(&member)
+	if result.RowsAffected == 0 {
+		return nil, errors.New(500, "USER_EXIST", "用户不存在"+username)
+	}
+	return &biz.Member{
+		ID:          member.ID,
+		UserName:    member.Username,
+		Password:    member.Password,
+		CreatedAt:   member.CreatedAt,
+		LastLoginAt: member.LastLoginAt,
+	}, nil
+}
+
 func checkPassword(psd, encryptedPassword string) bool {
 	options := &password.Options{SaltLen: 16, Iterations: 10000, KeyLen: 32, HashFunction: sha512.New}
 	passwordInfo := strings.Split(encryptedPassword, "$")
