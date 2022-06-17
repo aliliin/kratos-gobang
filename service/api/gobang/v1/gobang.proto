@@ -35,6 +35,7 @@ service Gobang {
       body: "*",
     };
   }
+
   rpc SayHello (HelloRequest) returns (HelloReply) {
     option (google.api.http) = {
       get: "/helloworld/{name}"

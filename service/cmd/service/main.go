@@ -2,10 +2,9 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
 	"os"
+	"service/internal/server"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -26,47 +25,15 @@ var (
 	flagconf string
 
 	id, _ = os.Hostname()
-
-	upgrader = websocket.Upgrader{
-		ReadBufferSize:  1024,
-		WriteBufferSize: 1024,
-		// 解决跨域问题
-		CheckOrigin: func(r *http.Request) bool {
-			return true
-		},
-	}
 )
 
 func init() {
 	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
 }
 
-func WsHandler(w http.ResponseWriter, r *http.Request) {
-	c, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		fmt.Println("module", err)
-		return
-	}
-	defer c.Close()
-	for {
-		mt, message, err := c.ReadMessage()
-		if err != nil {
-
-			fmt.Println("read", err)
-			break
-		}
-		fmt.Printf("recv: %s\n", message)
-		err = c.WriteMessage(mt, message)
-		if err != nil {
-			fmt.Println("write", err)
-			break
-		}
-	}
-}
-
 func newApp(logger log.Logger, hs *http.Server) *kratos.App {
 	router := mux.NewRouter()
-	router.HandleFunc("/ws", WsHandler)
+	router.HandleFunc("/ws", server.WsHandler)
 	hs.HandlePrefix("/", router)
 	return kratos.New(
 		kratos.ID(id),
